@@ -1018,8 +1018,8 @@ config BT_BLE_50_FEATURES_SUPPORTED
 
 config BT_BLE_42_FEATURES_SUPPORTED
     bool "Enable BLE 4.2 features"
-    depends on (BT_BLUEDROID_ENABLED && (IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3))
-    default n
+    depends on BT_BLUEDROID_ENABLED
+    default y
     help
         This enables BLE 4.2 features.
 
