@@ -5,12 +5,13 @@
 
 #pragma once
 
-#define SOC_CPU_CORES_NUM       1
-#define SOC_GDMA_SUPPORTED      1
-#define SOC_TWAI_SUPPORTED      1
-#define SOC_BT_SUPPORTED        1
-#define SOC_DIG_SIGN_SUPPORTED  1
-#define SOC_HMAC_SUPPORTED      1
+#define SOC_CPU_CORES_NUM           1
+#define SOC_GDMA_SUPPORTED          1
+#define SOC_TWAI_SUPPORTED          1
+#define SOC_BT_SUPPORTED            1
+#define SOC_DIG_SIGN_SUPPORTED      1
+#define SOC_HMAC_SUPPORTED          1
+#define SOC_ASYNC_MEMCPY_SUPPORTED  1
 
 #include "rmt_caps.h"
 
@@ -47,17 +48,6 @@
 /*-------------------------- TWAI CAPS ---------------------------------------*/
 #define SOC_TWAI_BRP_MIN                2
 #define SOC_TWAI_BRP_MAX                32768
-
-#define SOC_ADC_CHANNEL_NUM(PERIPH_NUM) ((PERIPH_NUM==0)? 5 : 1)
-#define SOC_ADC_MAX_CHANNEL_NUM         (10)
-
-/**
- * Check if adc support digital controller (DMA) mode.
- * @value
- *      - 1 : support;
- *      - 0 : not support;
- */
-#define SOC_ADC_SUPPORT_DMA_MODE(PERIPH_NUM) 1
 
 /*--------------------------- SHA CAPS ---------------------------------------*/
 
@@ -98,7 +88,7 @@
 #define SOC_ADC_PERIPH_NUM                      (2)
 #define SOC_ADC_PATT_LEN_MAX                    (16)
 #define SOC_ADC_CHANNEL_NUM(PERIPH_NUM)         ((PERIPH_NUM==0)? 5 : 1)
-#define SOC_ADC_MAX_CHANNEL_NUM                 (10)
+#define SOC_ADC_MAX_CHANNEL_NUM                 (5)
 #define SOC_ADC_MAX_BITWIDTH                    (12)
 #define SOC_ADC_DIGI_FILTER_NUM                 (2)
 #define SOC_ADC_DIGI_MONITOR_NUM                (2)

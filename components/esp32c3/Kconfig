@@ -23,6 +23,31 @@ menu "ESP32C3-Specific"
         default 80 if ESP32C3_DEFAULT_CPU_FREQ_80
         default 160 if ESP32C3_DEFAULT_CPU_FREQ_160
 
+    choice ESP32C3_REV_MIN
+        prompt "Minimum Supported ESP32-C3 Revision"
+        default ESP32C3_REV_MIN_3
+        help
+            Minimum revision that ESP-IDF would support.
+
+            Only supporting higher chip revisions can reduce binary size.
+
+        config ESP32C3_REV_MIN_0
+            bool "Rev 0"
+        config ESP32C3_REV_MIN_1
+            bool "Rev 1"
+        config ESP32C3_REV_MIN_2
+            bool "Rev 2"
+        config ESP32C3_REV_MIN_3
+            bool "Rev 3"
+    endchoice
+
+    config ESP32C3_REV_MIN
+        int
+        default 0 if ESP32C3_REV_MIN_0
+        default 1 if ESP32C3_REV_MIN_1
+        default 2 if ESP32C3_REV_MIN_2
+        default 3 if ESP32C3_REV_MIN_3
+
     choice ESP32C3_UNIVERSAL_MAC_ADDRESSES
         bool "Number of universally administered (by IEEE) MAC address"
         default ESP32C3_UNIVERSAL_MAC_ADDRESSES_TWO
@@ -201,5 +226,24 @@ menu "ESP32C3-Specific"
         help
             If enabled, this disables the linking of binary libraries in the application build. Note
             that after enabling this Wi-Fi/Bluetooth will not work.
+
+    config ESP32C3_LIGHTSLEEP_GPIO_RESET_WORKAROUND
+        bool "light sleep GPIO reset workaround"
+        default y
+        select PM_SLP_DISABLE_GPIO if FREERTOS_USE_TICKLESS_IDLE
+        help
+            ESP32C3 will reset at wake-up if GPIO is received a small electrostatic pulse during
+            light sleep, with specific condition
+
+            - GPIO needs to be configured as input-mode only
+            - The pin receives a small electrostatic pulse, and reset occurs when the pulse
+              voltage is higher than 6 V
+
+            For GPIO set to input mode only, it is not a good practice to leave it open/floating,
+            The hardware design needs to controlled it with determined supply or ground voltage
+            is necessary.
+
+            This option provides a software workaround for this issue. Configure to isolate all
+            GPIO pins in sleep state.
 
 endmenu  # ESP32C3-Specific
