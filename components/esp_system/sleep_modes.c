@@ -34,7 +34,6 @@
 
 #include "soc/cpu.h"
 #include "soc/rtc.h"
-#include "soc/soc_caps.h"
 
 #include "hal/wdt_hal.h"
 #include "hal/rtc_hal.h"
@@ -53,14 +52,14 @@
 #include "esp32/rom/cache.h"
 #include "esp32/clk.h"
 #include "esp32/rom/rtc.h"
-#include "driver/gpio.h"
+#include "esp_private/gpio.h"
 #elif CONFIG_IDF_TARGET_ESP32S2
 #include "esp32s2/clk.h"
 #include "esp32s2/rom/cache.h"
 #include "esp32s2/rom/rtc.h"
 #include "esp32s2/brownout.h"
 #include "soc/extmem_reg.h"
-#include "driver/gpio.h"
+#include "esp_private/gpio.h"
 #elif CONFIG_IDF_TARGET_ESP32S3
 #include "esp32s3/clk.h"
 #include "esp32s3/rom/cache.h"
@@ -68,7 +67,7 @@
 #include "soc/extmem_reg.h"
 #elif CONFIG_IDF_TARGET_ESP32C3
 #include "esp32c3/clk.h"
-#include "esp32s3/rom/cache.h"
+#include "esp32c3/rom/cache.h"
 #include "esp32c3/rom/rtc.h"
 #include "soc/extmem_reg.h"
 #include "esp_heap_caps.h"
@@ -342,7 +341,7 @@ static void IRAM_ATTR suspend_uarts(void)
         uint32_t uart_fsm = 0;
         do {
             uart_fsm = uart_ll_get_fsm_status(i);
-        } while (!(uart_fsm == UART_FSM_IDLE || uart_fsm == UART_FSM_TX_WAIT_SEND));
+        } while (!(uart_fsm == UART_LL_FSM_IDLE || uart_fsm == UART_LL_FSM_TX_WAIT_SEND));
 #else
         while (uart_ll_get_fsm_status(i) != 0) {}
 #endif
@@ -368,13 +367,13 @@ esp_err_t esp_sleep_cpu_pd_low_init(bool enable)
 {
     if (enable) {
         if (s_config.cpu_pd_mem == NULL) {
-            void *buf = heap_caps_aligned_alloc(RTC_CNTL_CPU_PD_DMA_ADDR_ALIGN,
-                                                RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE + RTC_HAL_DMA_LINK_NODE_SIZE,
+            void *buf = heap_caps_aligned_alloc(SOC_RTC_CNTL_CPU_PD_DMA_ADDR_ALIGN,
+                                                SOC_RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE + RTC_HAL_DMA_LINK_NODE_SIZE,
                                                 MALLOC_CAP_RETENTION | MALLOC_CAP_DEFAULT);
             if (buf) {
-                memset(buf, 0, RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE + RTC_HAL_DMA_LINK_NODE_SIZE);
+                memset(buf, 0, SOC_RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE + RTC_HAL_DMA_LINK_NODE_SIZE);
                 s_config.cpu_pd_mem = rtc_cntl_hal_dma_link_init(buf,
-                                      buf + RTC_HAL_DMA_LINK_NODE_SIZE, RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE, NULL);
+                                      buf + RTC_HAL_DMA_LINK_NODE_SIZE, SOC_RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE, NULL);
             } else {
                 return ESP_ERR_NO_MEM;
             }
@@ -1172,6 +1171,15 @@ esp_err_t esp_sleep_enable_wifi_wakeup(void)
 #endif
 }
 
+esp_err_t esp_sleep_disable_wifi_wakeup(void)
+{
+#if SOC_PM_SUPPORT_WIFI_WAKEUP
+    s_config.wakeup_triggers &= (~RTC_WIFI_TRIG_EN);
+    return ESP_OK;
+#else
+    return ESP_ERR_NOT_SUPPORTED;
+#endif
+}
 
 esp_sleep_wakeup_cause_t esp_sleep_get_wakeup_cause(void)
 {

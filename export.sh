@@ -17,7 +17,7 @@ idf_export_main() {
     # Doing this in case someone tries to chmod +x it and execute...
 
     # shellcheck disable=SC2128,SC2169,SC2039 # ignore array expansion warning
-    if [ -n "${BASH_SOURCE}" ] && [ "${BASH_SOURCE[0]}" = "${0}" ]
+    if [ -n "${BASH_SOURCE-}" ] && [ "${BASH_SOURCE[0]}" = "${0}" ]
     then
         echo "This script should be sourced, not executed:"
         # shellcheck disable=SC2039  # reachable only with bash
@@ -32,10 +32,10 @@ idf_export_main() {
         self_path=""
 
         # shellcheck disable=SC2128  # ignore array expansion warning
-        if [ -n "${BASH_SOURCE}" ]
+        if [ -n "${BASH_SOURCE-}" ]
         then
             self_path="${BASH_SOURCE}"
-        elif [ -n "${ZSH_VERSION}" ]
+        elif [ -n "${ZSH_VERSION-}" ]
         then
             self_path="${(%):-%x}"
         else
@@ -141,13 +141,27 @@ idf_export_main() {
 }
 
 enable_autocomplete() {
-    if [ -n "$ZSH_VERSION" ]
+    click_version="$(python -c 'import click; print(click.__version__.split(".")[0])')"
+    if [[ click_version -lt 8 ]]
+    then
+        SOURCE_ZSH=source_zsh
+        SOURCE_BASH=source_bash
+    else
+        SOURCE_ZSH=zsh_source
+        SOURCE_BASH=bash_source
+    fi
+    if [ -n "${ZSH_VERSION-}" ]
     then
         autoload -Uz compinit && compinit -u
-        eval "$(env _IDF.PY_COMPLETE=source_zsh idf.py)" || echo "WARNING: Failed to load shell autocompletion!"
-    else
-        eval "$(env _IDF.PY_COMPLETE=source_bash idf.py)"  || echo "WARNING: Failed to load shell autocompletion!"
+        eval "$(env _IDF.PY_COMPLETE=$SOURCE_ZSH idf.py)" || echo "WARNING: Failed to load shell autocompletion!"
+    elif [ -n "${BASH_SOURCE-}" ]
+    then
+        eval "$(env _IDF.PY_COMPLETE=$SOURCE_BASH idf.py)"  || echo "WARNING: Failed to load shell autocompletion!"
     fi
+
+    unset SOURCE_ZSH
+    unset SOURCE_BASH
+
 }
 
 idf_export_main
