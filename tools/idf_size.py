@@ -78,7 +78,7 @@ class MemRegions(object):
                 # MemRegDef(0x3FFF8000, 0x4000, MemRegions.DIRAM_ID, 0x400A4000),
                 # MemRegDef(0x3FFFC000, 0x4000, MemRegions.DIRAM_ID, 0x400A0000),
                 #
-                MemRegDef(0x40070000, 2 * 0x8000 + 16 * 0x2000, MemRegions.IRAM_ID, 0),
+                MemRegDef(0x40070000, 2 * 0x8000 + 16 * 0x2000 + 2 * 0x2000, MemRegions.IRAM_ID, 0),
                 # MemRegDef(0x40070000, 0x8000, MemRegions.IRAM_ID, 0),
                 # MemRegDef(0x40078000, 0x8000, MemRegions.IRAM_ID, 0),
                 # MemRegDef(0x40080000, 0x2000, MemRegions.IRAM_ID, 0),
@@ -516,7 +516,6 @@ def get_summary(path, mem_reg, memory_config, sections,
                 path_diff=None, mem_reg_diff=None, memory_config_diff=None, sections_diff=None):
 
     diff_en = mem_reg_diff and memory_config_diff and sections_diff
-
     current = StructureForSummary.get(mem_reg, memory_config, sections)
     reference = StructureForSummary.get(mem_reg_diff,
                                         memory_config_diff,
