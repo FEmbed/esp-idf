@@ -158,6 +158,7 @@ static esp_netif_t* esp_netif_is_active(esp_netif_t *arg)
  */
 static void esp_netif_set_default_netif(esp_netif_t *esp_netif)
 {
+    netif_set_up(esp_netif->lwip_netif);
     if (_IS_NETIF_POINT2POINT_TYPE(esp_netif, PPP_LWIP_NETIF)) {
         esp_netif_ppp_set_default_netif(esp_netif->netif_handle);
     } else {
@@ -230,6 +231,11 @@ static esp_err_t esp_netif_update_default_netif_lwip(esp_netif_api_msg_t *msg)
 static esp_err_t esp_netif_update_default_netif(esp_netif_t *esp_netif, esp_netif_action_t action)
 {
     return esp_netif_lwip_ipc_call(esp_netif_update_default_netif_lwip, esp_netif, (void*)action);
+}
+
+void esp_netif_action_update_default_netif(void *esp_netif, uint8_t on_off)
+{
+    esp_netif_update_default_netif(esp_netif, on_off?ESP_NETIF_STARTED:ESP_NETIF_STOPPED);
 }
 
 void esp_netif_set_ip4_addr(esp_ip4_addr_t *addr, uint8_t a, uint8_t b, uint8_t c, uint8_t d)

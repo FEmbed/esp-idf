@@ -202,6 +202,14 @@ void esp_netif_action_start(void *esp_netif, esp_event_base_t base, int32_t even
 void esp_netif_action_stop(void *esp_netif, esp_event_base_t base, int32_t event_id, void *data);
 
 /**
+ * @brief Default update default netif for esp_netif
+ * 
+ * @param esp_netif Handle to esp-netif instance
+ * @param on_off 
+ */
+void esp_netif_action_update_default_netif(void *esp_netif, uint8_t on_off);
+
+/**
  * @brief Default building block for network interface action upon IO driver connected event
  *
  * @note This API can be directly used as event handler
